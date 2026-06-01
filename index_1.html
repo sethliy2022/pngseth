@@ -1,0 +1,888 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" type="image/x-icon" href="favicon.ico">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Seth Liyanapathirana</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@700&family=Courier+Prime:ital,wght@0,400;1,400&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --cream: #e8e6e0;
+    --black: #0d0d0d;
+    --mid: #5a5a5a;
+    --border: rgba(13,13,13,0.13);
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Courier Prime', monospace;
+    background: var(--cream);
+    color: var(--black);
+    font-size: 14px;
+    line-height: 1.6;
+  }
+
+  main { display: block; width: 100%; }
+
+  /* ── LOADING SCREEN ── */
+  #loader {
+    position: fixed;
+    inset: 0;
+    background: #0000ff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    transition: opacity 0.8s ease, visibility 0.8s ease;
+  }
+  #loader.hide {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+  }
+  #loader-svg {
+    width: 110px;
+    height: 110px;
+    overflow: visible;
+  }
+  #loader-svg path {
+    fill: #ffffff;
+    opacity: 0;
+    transform: translateY(18px) scale(0.92);
+    transform-origin: center;
+    transform-box: fill-box;
+    animation: logoAssemble 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.15s both;
+  }
+  #loader-name {
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: 13px;
+    letter-spacing: 0.22em;
+    color: rgba(255,255,255,0.9);
+    margin-top: 22px;
+    opacity: 0;
+    animation: fadeUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.7s both;
+    white-space: nowrap;
+  }
+  #loader-cursor {
+    display: inline-block;
+    width: 2px;
+    height: 1em;
+    background: rgba(255,255,255,0.7);
+    margin-left: 3px;
+    vertical-align: middle;
+    animation: blink 0.7s step-end infinite;
+    opacity: 0;
+    animation: fadeUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.7s both, blink 0.7s step-end 0.7s infinite;
+  }
+  @keyframes logoAssemble {
+    from { opacity: 0; transform: translateY(18px) scale(0.92); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+  }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50%       { opacity: 0; }
+  }
+
+  /* ── FILM GRAIN ── */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 9998;
+    opacity: 0.05;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+    background-repeat: repeat;
+    background-size: 180px;
+  }
+
+  /* ── HEADER ── */
+  header {
+    text-align: center;
+    padding: 52px 40px 44px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .header-logo {
+    width: 72px;
+    height: 72px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+  }
+
+  .header-logo img { width: 100%; height: 100%; object-fit: cover; }
+
+  .header-name {
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: clamp(36px, 8vw, 96px);
+    letter-spacing: -0.01em;
+    line-height: 0.95;
+    color: var(--black);
+    margin-bottom: 16px;
+  }
+
+  header .sub {
+    font-family: 'Courier Prime', monospace;
+    text-transform: lowercase;
+    font-size: 17px;
+    color: var(--mid);
+    font-style: normal;
+  }
+
+  header .sub a {
+    color: var(--mid);
+    text-decoration: none;
+    transition: color 0.15s;
+  }
+  header .sub a:hover { color: var(--black); }
+
+  /* ── NAV ── */
+  nav {
+    display: flex;
+    justify-content: center;
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    background: var(--cream);
+    z-index: 100;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  nav::-webkit-scrollbar { display: none; }
+
+  nav a {
+    font-family: 'Courier Prime', monospace;
+    text-transform: lowercase;
+    font-size: 12px;
+    letter-spacing: 0.06em;
+    color: var(--mid);
+    text-decoration: none;
+    padding: 14px 22px;
+    white-space: nowrap;
+    border-bottom: 1.5px solid transparent;
+    transition: all 0.15s;
+    display: block;
+    font-style: normal;
+  }
+  nav a:hover { color: var(--black); border-bottom-color: var(--black); }
+
+  /* ── SECTIONS ── */
+  .section {
+    padding: 40px 0 16px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .section-header {
+    text-align: center;
+    margin-bottom: 14px;
+    padding: 0 48px;
+  }
+
+  .section-eyebrow {
+    font-family: 'Courier Prime', monospace;
+    text-transform: lowercase;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    color: var(--mid);
+    margin-bottom: 8px;
+    font-style: normal;
+  }
+
+  .section-title {
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: clamp(18px, 3vw, 28px);
+    letter-spacing: 0.03em;
+    line-height: 1.1;
+    color: var(--black);
+  }
+
+  /* ── FEATURED GRID (2 rows horizontal scroll) ── */
+  .featured-grid-wrapper {
+    overflow-x: auto;
+    overflow-y: hidden;
+    scrollbar-width: none;
+    cursor: grab;
+    width: 100%;
+  }
+  .featured-grid-wrapper::-webkit-scrollbar { display: none; }
+  .featured-grid-wrapper:active { cursor: grabbing; }
+
+  .featured-grid {
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: column;
+    height: 648px;
+    gap: 4px;
+    width: max-content;
+  }
+
+  .featured-grid .carousel-item {
+    height: 320px;
+    width: auto;
+    flex: none;
+  }
+
+  @media (max-width: 700px) {
+    .featured-grid {
+      height: 268px;
+    }
+    .featured-grid .carousel-item {
+      height: 130px;
+      width: auto;
+    }
+  }
+
+  /* ── CAROUSEL ── */
+  .carousel-wrapper { position: relative; width: 100%; }
+
+  .carousel {
+    display: flex;
+    gap: 4px;
+    overflow-x: hidden;
+    scrollbar-width: none;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+  }
+  .carousel::-webkit-scrollbar { display: none; }
+
+  .carousel-item {
+    flex: 0 0 auto;
+    height: 320px;
+    width: auto;
+    overflow: hidden;
+    background: transparent;
+    position: relative;
+    cursor: pointer;
+  }
+
+  .carousel-item img {
+    height: 100%;
+    width: auto;
+    object-fit: cover; display: block;
+    transition: transform 0.55s cubic-bezier(0.25,0.46,0.45,0.94);
+  }
+  .carousel-item:hover img { transform: scale(1.05); }
+
+  .overlay {
+    position: absolute; inset: 0;
+    background: rgba(13,13,13,0);
+    transition: background 0.3s;
+    display: flex; align-items: flex-end;
+    padding: 14px 16px;
+  }
+  .carousel-item:hover .overlay { background: rgba(13,13,13,0.52); }
+
+  .overlay-text {
+    font-family: 'Courier Prime', monospace;
+    text-transform: lowercase;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    color: var(--cream);
+    opacity: 0;
+    transform: translateY(5px);
+    transition: all 0.3s;
+    font-style: normal;
+  }
+  .carousel-item:hover .overlay-text { opacity: 1; transform: translateY(0); }
+
+  .placeholder {
+    width: 100%; height: 100%;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    gap: 12px;
+    border: 1px dashed rgba(13,13,13,0.18);
+  }
+  .placeholder svg { width: 24px; height: 24px; stroke: rgba(13,13,13,0.22); stroke-width: 1.2; fill: none; }
+  .placeholder span {
+    font-family: 'Courier Prime', monospace;
+    font-size: 10px; letter-spacing: 0.14em;
+    color: rgba(13,13,13,0.28);
+    text-transform: lowercase;
+  }
+
+  /* ── ABOUT ── */
+  .about-section {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 72px;
+    padding: 64px 48px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .about-eyebrow {
+    font-family: 'Courier Prime', monospace;
+    text-transform: lowercase;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    color: var(--mid);
+    margin-bottom: 14px;
+    font-style: normal;
+  }
+
+  .about-section h2 {
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: 26px;
+    margin-bottom: 16px;
+    line-height: 1.15;
+    color: var(--black);
+  }
+
+  .about-section p {
+    font-family: 'Courier Prime', monospace;
+    text-transform: lowercase;
+    font-size: 13px;
+    color: #3a3a3a;
+    line-height: 2.1;
+    font-style: normal;
+  }
+
+  .skills-list { list-style: none; }
+
+  .skills-list li {
+    font-family: 'Courier Prime', monospace;
+    text-transform: lowercase;
+    font-size: 12px;
+    color: var(--black);
+    padding: 11px 0;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    letter-spacing: 0.02em;
+    font-style: normal;
+  }
+
+  .skills-list li::after {
+    content: '→';
+    color: var(--mid);
+  }
+
+  /* ── CONTACT ── */
+  .contact-section {
+    padding: 80px 48px;
+    text-align: center;
+  }
+
+  .contact-eyebrow {
+    font-family: 'Courier Prime', monospace;
+    text-transform: lowercase;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    color: var(--mid);
+    margin-bottom: 12px;
+    font-style: normal;
+  }
+
+  .contact-section h2 {
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: clamp(32px, 5vw, 60px);
+    line-height: 1;
+    margin-bottom: 36px;
+    color: var(--black);
+  }
+
+  .contact-links { display: flex; justify-content: center; gap: 36px; flex-wrap: wrap; }
+
+  .contact-links a {
+    font-family: 'Courier Prime', monospace;
+    text-transform: lowercase;
+    font-size: 12px;
+    letter-spacing: 0.1em;
+    color: var(--black);
+    text-decoration: none;
+    border-bottom: 1px solid var(--black);
+    padding-bottom: 2px;
+    transition: opacity 0.15s;
+    font-style: normal;
+  }
+  .contact-links a:hover { opacity: 0.38; }
+
+  /* ── FOOTER ── */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 18px 48px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  footer span {
+    font-family: 'Courier Prime', monospace;
+    text-transform: lowercase;
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    color: var(--mid);
+    font-style: normal;
+  }
+
+  /* ── LIGHTBOX ── */
+  .lightbox {
+    display: none; position: fixed; inset: 0;
+    background: rgba(232,230,224,0.97);
+    z-index: 1000; align-items: center; justify-content: center;
+  }
+  .lightbox.open { display: flex; }
+  .lightbox img { max-width: 86vw; max-height: 86vh; object-fit: contain; }
+  .lightbox-close {
+    position: fixed; top: 24px; right: 36px;
+    font-family: 'Courier Prime', monospace;
+    text-transform: lowercase;
+    font-size: 12px; letter-spacing: 0.1em;
+    cursor: pointer; background: none; border: none;
+    color: var(--black); opacity: 0.4; transition: opacity 0.2s;
+    font-style: normal;
+  }
+  .lightbox-close:hover { opacity: 1; }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 700px) {
+    header { padding: 36px 20px 28px; }
+    .header-name { font-size: clamp(32px, 10vw, 60px); }
+    .section { padding: 40px 0 36px; }
+    .section-header { padding: 0 20px; }
+    .carousel-item { height: 220px; width: auto; }
+    .about-section { grid-template-columns: 1fr; gap: 40px; padding: 40px 20px; }
+    .contact-section { padding: 56px 20px; }
+    footer { padding: 16px 20px; flex-direction: column; gap: 4px; text-align: center; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ── LOADING SCREEN ── -->
+<div id="loader">
+  <svg id="loader-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 782 690">
+    <path d="M339.11 516.49 c-6.25 -1.65 -11.36 -6.11 -13.87 -12.15 -1.58 -3.88 -1.44 -15.67 0.29 -20.70 0.72 -2.16 3.88 -9.42 7.12 -16.10 10.49 -22.28 16.67 -36.58 26.52 -61.24 0.22 -0.50 -3.81 1.08 -8.84 3.45 -17.90 8.48 -39.46 17.61 -79.71 33.71 -39.10 15.67 -68.14 25.95 -100.34 35.58 -41.90 12.58 -51.53 13.37 -59.94 5.03 -4.17 -4.24 -5.39 -7.55 -5.39 -15.09 0 -8.27 0.79 -10.93 4.38 -15.02 3.95 -4.46 6.61 -5.75 19.48 -9.06 27.89 -7.33 59.01 -17.25 87.18 -27.67 17.61 -6.54 26.67 -10.13 65.05 -25.95 l19.05 -7.83 -8.98 -0.50 c-4.96 -0.22 -17.54 -0.79 -28.03 -1.22 -61.45 -2.59 -105.44 -8.77 -123.91 -17.54 -8.48 -4.03 -13.23 -8.34 -16.46 -14.81 -2.16 -4.46 -2.30 -5.10 -2.30 -13.01 0 -8.19 0.07 -8.48 2.66 -13.73 6.47 -13.01 22.57 -25.52 52.33 -40.47 39.03 -19.69 82.94 -35.94 126.50 -46.79 10.85 -2.73 14.59 -3.38 20.48 -3.45 8.98 -0.14 12.58 1.08 17.11 5.89 4.10 4.38 5.18 7.55 5.10 15.52 0 7.83 -1.58 11.79 -6.47 16.10 -3.67 3.23 -6.32 4.10 -28.03 9.34 -25.59 6.11 -59.66 17.97 -89.05 30.98 -15.02 6.61 -43.13 20.84 -41.11 20.84 0.29 0 3.67 0.50 7.55 1.08 27.53 4.10 70.44 7.12 132.03 9.34 31.55 1.15 45.64 2.37 54.41 4.67 2.88 0.72 5.25 1.29 5.25 1.22 0.07 -0.07 1.01 -3.23 2.08 -6.97 13.01 -45.07 34.43 -104.87 41.04 -114.57 4.17 -6.18 8.63 -8.55 16.96 -8.91 7.98 -0.43 12.36 0.93 16.67 5.18 4.10 3.95 5.53 8.19 5.53 16.17 -0.07 7.04 0.07 6.76 -8.91 28.75 -6.68 16.39 -18.54 51.68 -34.50 102.49 -9.27 29.47 -17.32 52.83 -23 66.77 -1.44 3.52 -2.44 6.54 -2.30 6.68 0.14 0.14 4.24 -1.94 9.13 -4.67 30.12 -16.82 64.40 -32.06 144.40 -64.11 58.79 -23.58 87.54 -34.28 134.77 -50.31 24.44 -8.27 29.25 -9.20 36.30 -6.83 5.18 1.73 10.13 6.68 11.86 11.79 1.65 4.96 1.29 15.74 -0.65 19.48 -1.80 3.45 -5.32 7.04 -8.55 8.70 -1.51 0.79 -14.02 5.32 -27.67 9.99 -47.65 16.24 -76.12 26.95 -135.27 50.67 -64.90 26.09 -86.61 35.51 -114.64 49.67 -23.86 12 -41.26 21.92 -64.47 36.66 -5.82 3.74 -12.58 7.83 -15.09 9.20 -8.05 4.46 -16.32 5.75 -23.72 3.74z"/>
+  </svg>
+  <div id="loader-name"><span id="loader-text"></span><span id="loader-cursor"></span></div>
+</div>
+
+<!-- ── HEADER ── -->
+<header>
+  <div class="header-logo">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 782 690" width="100%" height="100%">
+      <g fill="#0000ff"><path d="M339.11 516.49 c-6.25 -1.65 -11.36 -6.11 -13.87 -12.15 -1.58 -3.88 -1.44 -15.67 0.29 -20.70 0.72 -2.16 3.88 -9.42 7.12 -16.10 10.49 -22.28 16.67 -36.58 26.52 -61.24 0.22 -0.50 -3.81 1.08 -8.84 3.45 -17.90 8.48 -39.46 17.61 -79.71 33.71 -39.10 15.67 -68.14 25.95 -100.34 35.58 -41.90 12.58 -51.53 13.37 -59.94 5.03 -4.17 -4.24 -5.39 -7.55 -5.39 -15.09 0 -8.27 0.79 -10.93 4.38 -15.02 3.95 -4.46 6.61 -5.75 19.48 -9.06 27.89 -7.33 59.01 -17.25 87.18 -27.67 17.61 -6.54 26.67 -10.13 65.05 -25.95 l19.05 -7.83 -8.98 -0.50 c-4.96 -0.22 -17.54 -0.79 -28.03 -1.22 -61.45 -2.59 -105.44 -8.77 -123.91 -17.54 -8.48 -4.03 -13.23 -8.34 -16.46 -14.81 -2.16 -4.46 -2.30 -5.10 -2.30 -13.01 0 -8.19 0.07 -8.48 2.66 -13.73 6.47 -13.01 22.57 -25.52 52.33 -40.47 39.03 -19.69 82.94 -35.94 126.50 -46.79 10.85 -2.73 14.59 -3.38 20.48 -3.45 8.98 -0.14 12.58 1.08 17.11 5.89 4.10 4.38 5.18 7.55 5.10 15.52 0 7.83 -1.58 11.79 -6.47 16.10 -3.67 3.23 -6.32 4.10 -28.03 9.34 -25.59 6.11 -59.66 17.97 -89.05 30.98 -15.02 6.61 -43.13 20.84 -41.11 20.84 0.29 0 3.67 0.50 7.55 1.08 27.53 4.10 70.44 7.12 132.03 9.34 31.55 1.15 45.64 2.37 54.41 4.67 2.88 0.72 5.25 1.29 5.25 1.22 0.07 -0.07 1.01 -3.23 2.08 -6.97 13.01 -45.07 34.43 -104.87 41.04 -114.57 4.17 -6.18 8.63 -8.55 16.96 -8.91 7.98 -0.43 12.36 0.93 16.67 5.18 4.10 3.95 5.53 8.19 5.53 16.17 -0.07 7.04 0.07 6.76 -8.91 28.75 -6.68 16.39 -18.54 51.68 -34.50 102.49 -9.27 29.47 -17.32 52.83 -23 66.77 -1.44 3.52 -2.44 6.54 -2.30 6.68 0.14 0.14 4.24 -1.94 9.13 -4.67 30.12 -16.82 64.40 -32.06 144.40 -64.11 58.79 -23.58 87.54 -34.28 134.77 -50.31 24.44 -8.27 29.25 -9.20 36.30 -6.83 5.18 1.73 10.13 6.68 11.86 11.79 1.65 4.96 1.29 15.74 -0.65 19.48 -1.80 3.45 -5.32 7.04 -8.55 8.70 -1.51 0.79 -14.02 5.32 -27.67 9.99 -47.65 16.24 -76.12 26.95 -135.27 50.67 -64.90 26.09 -86.61 35.51 -114.64 49.67 -23.86 12 -41.26 21.92 -64.47 36.66 -5.82 3.74 -12.58 7.83 -15.09 9.20 -8.05 4.46 -16.32 5.75 -23.72 3.74z"/></g>
+    </svg>
+  </div>
+  <div class="header-name">Seth Liyanapathirana</div>
+  <p class="sub">Graphic Designer &nbsp;&middot;&nbsp; <a href="https://instagram.com/png.seth" target="_blank">@png.seth on Instagram</a></p>
+</header>
+
+<!-- ── NAV ── -->
+<nav>
+  <a href="#featured">featured</a>
+  <a href="#basketball">nccu basketball</a>
+  <a href="#football">duke football</a>
+  <a href="#desi">desi dance network</a>
+  <a href="#logos">logo + misc</a>
+  <a href="#about">about</a>
+  <a href="#contact">contact</a>
+</nav>
+
+<main>
+
+  <!-- ── FEATURED ── -->
+  <section class="section" id="featured">
+    <div class="section-header">
+      <div class="section-eyebrow">001 — Selected</div>
+      <h2 class="section-title">Featured Work</h2>
+    </div>
+    <div class="featured-grid-wrapper"><div class="featured-grid">
+        <div class="carousel-item" onclick="openLight(this)">
+          <img src="images/w9.png" alt="w9">
+          <div class="overlay"><span class="overlay-text">w9</span></div>
+        </div>
+        <div class="carousel-item" onclick="openLight(this)">
+          <img src="images/w13.png" alt="w13">
+          <div class="overlay"><span class="overlay-text">w13</span></div>
+        </div>
+        <div class="carousel-item" onclick="openLight(this)">
+          <img src="images/w2.png" alt="w2">
+          <div class="overlay"><span class="overlay-text">w2</span></div>
+        </div>
+        <div class="carousel-item" onclick="openLight(this)">
+          <img src="images/w3.png" alt="w3">
+          <div class="overlay"><span class="overlay-text">w3</span></div>
+        </div>
+        <div class="carousel-item" onclick="openLight(this)">
+          <img src="images/w5.png" alt="w5">
+          <div class="overlay"><span class="overlay-text">w5</span></div>
+        </div>
+        <div class="carousel-item" onclick="openLight(this)">
+          <img src="images/w15.png" alt="w15">
+          <div class="overlay"><span class="overlay-text">w15</span></div>
+        </div>
+        <div class="carousel-item" onclick="openLight(this)">
+          <img src="images/w10.png" alt="w10">
+          <div class="overlay"><span class="overlay-text">w10</span></div>
+        </div>
+        <div class="carousel-item" onclick="openLight(this)">
+          <img src="images/w1.png" alt="w1">
+          <div class="overlay"><span class="overlay-text">w1</span></div>
+        </div>
+        <div class="carousel-item" onclick="openLight(this)">
+          <img src="images/w83.png" alt="w83">
+          <div class="overlay"><span class="overlay-text">w83</span></div>
+        </div>
+        <div class="carousel-item" onclick="openLight(this)">
+          <img src="images/w6.png" alt="w6">
+          <div class="overlay"><span class="overlay-text">w6</span></div>
+        </div>
+        <div class="carousel-item" onclick="openLight(this)">
+          <img src="images/w16.png" alt="w16">
+          <div class="overlay"><span class="overlay-text">w16</span></div>
+        </div>
+        <div class="carousel-item" onclick="openLight(this)">
+          <img src="images/w11.png" alt="w11">
+          <div class="overlay"><span class="overlay-text">w11</span></div>
+        </div>
+        <div class="carousel-item" onclick="openLight(this)">
+          <img src="images/w8.png" alt="w8">
+          <div class="overlay"><span class="overlay-text">w8</span></div>
+        </div>
+        <div class="carousel-item" onclick="openLight(this)">
+          <img src="images/w14.png" alt="w14">
+          <div class="overlay"><span class="overlay-text">w14</span></div>
+        </div>
+        <div class="carousel-item" onclick="openLight(this)">
+          <img src="images/w4.png" alt="w4">
+          <div class="overlay"><span class="overlay-text">w4</span></div>
+        </div>
+        <div class="carousel-item" onclick="openLight(this)">
+          <img src="images/w7.png" alt="w7">
+          <div class="overlay"><span class="overlay-text">w7</span></div>
+        </div>
+        <div class="carousel-item" onclick="openLight(this)">
+          <img src="images/w12.png" alt="w12">
+          <div class="overlay"><span class="overlay-text">w12</span></div>
+        </div>
+        <div class="carousel-item" onclick="openLight(this)">
+          <img src="images/mlk.png" alt="mlk">
+          <div class="overlay"><span class="overlay-text">mlk</span></div>
+        </div>
+      </div>
+      </div>
+  </section>
+
+  <!-- ── BASKETBALL ── -->
+  <section class="section" id="basketball">
+    <div class="section-header">
+      <div class="section-eyebrow">002 — Sports</div>
+      <h2 class="section-title">NCCU Men's Basketball</h2>
+    </div>
+    <div class="carousel-wrapper">
+      <div class="carousel">
+        <div class="carousel-item" onclick="openLight(this)">
+          <img src="images/n5.png" alt="n5">
+          <div class="overlay"><span class="overlay-text">n5</span></div>
+        </div>
+        <div class="carousel-item" onclick="openLight(this)">
+          <img src="images/n9.png" alt="n9">
+          <div class="overlay"><span class="overlay-text">n9</span></div>
+        </div>
+        <div class="carousel-item" onclick="openLight(this)">
+          <img src="images/n3.png" alt="n3">
+          <div class="overlay"><span class="overlay-text">n3</span></div>
+        </div>
+        <div class="carousel-item" onclick="openLight(this)">
+          <img src="images/n4.png" alt="n4">
+          <div class="overlay"><span class="overlay-text">n4</span></div>
+        </div>
+        <div class="carousel-item" onclick="openLight(this)">
+          <img src="images/n11.png" alt="n11">
+          <div class="overlay"><span class="overlay-text">n11</span></div>
+        </div>
+        <div class="carousel-item" onclick="openLight(this)">
+          <img src="images/n12.png" alt="n12">
+          <div class="overlay"><span class="overlay-text">n12</span></div>
+        </div>
+        <div class="carousel-item" onclick="openLight(this)">
+          <img src="images/n8.png" alt="n8">
+          <div class="overlay"><span class="overlay-text">n8</span></div>
+        </div>
+        <div class="carousel-item" onclick="openLight(this)">
+          <img src="images/n6.png" alt="n6">
+          <div class="overlay"><span class="overlay-text">n6</span></div>
+        </div>
+        <div class="carousel-item" onclick="openLight(this)">
+          <img src="images/n7.png" alt="n7">
+          <div class="overlay"><span class="overlay-text">n7</span></div>
+        </div>
+        <div class="carousel-item" onclick="openLight(this)">
+          <img src="images/n10.png" alt="n10">
+          <div class="overlay"><span class="overlay-text">n10</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── FOOTBALL ── -->
+  <section class="section" id="football">
+    <div class="section-header">
+      <div class="section-eyebrow">003 — Sports</div>
+      <h2 class="section-title">Duke Football</h2>
+    </div>
+    <div class="carousel-wrapper">
+      <div class="carousel">
+        <div class="carousel-item" onclick="openLight(this)">
+          <img src="images/f1.png" alt="f1">
+          <div class="overlay"><span class="overlay-text">f1</span></div>
+        </div>
+        <div class="carousel-item" onclick="openLight(this)">
+          <img src="images/f2.png" alt="f2">
+          <div class="overlay"><span class="overlay-text">f2</span></div>
+        </div>
+        <div class="carousel-item" onclick="openLight(this)">
+          <img src="images/f4.png" alt="f4">
+          <div class="overlay"><span class="overlay-text">f4</span></div>
+        </div>
+        <div class="carousel-item" onclick="openLight(this)">
+          <img src="images/f5.png" alt="f5">
+          <div class="overlay"><span class="overlay-text">f5</span></div>
+        </div>
+        <div class="carousel-item" onclick="openLight(this)">
+          <img src="images/f8.png" alt="f8">
+          <div class="overlay"><span class="overlay-text">f8</span></div>
+        </div>
+        <div class="carousel-item" onclick="openLight(this)">
+          <img src="images/f3.jpeg" alt="f3">
+          <div class="overlay"><span class="overlay-text">f3</span></div>
+        </div>
+        <div class="carousel-item" onclick="openLight(this)">
+          <img src="images/f65.png" alt="f65">
+          <div class="overlay"><span class="overlay-text">f65</span></div>
+        </div>
+        <div class="carousel-item" onclick="openLight(this)">
+          <img src="images/f6.png" alt="f6">
+          <div class="overlay"><span class="overlay-text">f6</span></div>
+        </div>
+        <div class="carousel-item" onclick="openLight(this)">
+          <img src="images/f7.png" alt="f7">
+          <div class="overlay"><span class="overlay-text">f7</span></div>
+        </div>
+        <div class="carousel-item" onclick="openLight(this)">
+          <img src="images/f890.png" alt="f890">
+          <div class="overlay"><span class="overlay-text">f890</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── DESI DANCE NETWORK ── -->
+  <section class="section" id="desi">
+    <div class="section-header">
+      <div class="section-eyebrow">004 — dance</div>
+      <h2 class="section-title">Desi Dance Network</h2>
+    </div>
+    <div class="carousel-wrapper">
+      <div class="carousel">
+        <div class="carousel-item" onclick="openLight(this)">
+          <img src="images/d1.png" alt="d1">
+          <div class="overlay"><span class="overlay-text">d1</span></div>
+        </div>
+        <div class="carousel-item" onclick="openLight(this)">
+          <img src="images/d2.png" alt="d2">
+          <div class="overlay"><span class="overlay-text">d2</span></div>
+        </div>
+        <div class="carousel-item" onclick="openLight(this)">
+          <img src="images/d3.png" alt="d3">
+          <div class="overlay"><span class="overlay-text">d3</span></div>
+        </div>
+        <div class="carousel-item" onclick="openLight(this)">
+          <img src="images/d4.png" alt="d4">
+          <div class="overlay"><span class="overlay-text">d4</span></div>
+        </div>
+        <div class="carousel-item" onclick="openLight(this)">
+          <img src="images/d5.png" alt="d5">
+          <div class="overlay"><span class="overlay-text">d5</span></div>
+        </div>
+        <div class="carousel-item" onclick="openLight(this)">
+          <img src="images/d7.png" alt="d7">
+          <div class="overlay"><span class="overlay-text">d7</span></div>
+        </div>
+        <div class="carousel-item" onclick="openLight(this)">
+          <img src="images/d43.png" alt="d43">
+          <div class="overlay"><span class="overlay-text">d43</span></div>
+        </div>
+        <div class="carousel-item" onclick="openLight(this)">
+          <img src="images/d6.png" alt="d6">
+          <div class="overlay"><span class="overlay-text">d6</span></div>
+        </div>
+        <div class="carousel-item" onclick="openLight(this)">
+          <img src="images/d654.png" alt="d654">
+          <div class="overlay"><span class="overlay-text">d654</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── LOGO DESIGN + MISC ── -->
+  <section class="section" id="logos">
+    <div class="section-header">
+      <div class="section-eyebrow">005 — branding</div>
+      <h2 class="section-title">Logo Design + Misc</h2>
+    </div>
+    <div class="carousel-wrapper">
+      <div class="carousel">
+        <div class="carousel-item" onclick="openLight(this)">
+          <img src="images/l1.png" alt="l1">
+          <div class="overlay"><span class="overlay-text">l1</span></div>
+        </div>
+        <div class="carousel-item" onclick="openLight(this)">
+          <img src="images/l4.png" alt="l4">
+          <div class="overlay"><span class="overlay-text">l4</span></div>
+        </div>
+        <div class="carousel-item" onclick="openLight(this)">
+          <img src="images/l3.png" alt="l3">
+          <div class="overlay"><span class="overlay-text">l3</span></div>
+        </div>
+        <div class="carousel-item" onclick="openLight(this)">
+          <img src="images/l5.png" alt="l5">
+          <div class="overlay"><span class="overlay-text">l5</span></div>
+        </div>
+        <div class="carousel-item" onclick="openLight(this)">
+          <img src="images/l2.png" alt="l2">
+          <div class="overlay"><span class="overlay-text">l2</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── ABOUT ── -->
+  <section class="about-section" id="about">
+    <div>
+      <div class="about-eyebrow">006 — about</div>
+      <h2>The<br>Designer</h2>
+      <p>Graphic designer specializing in sports branding, event graphics, and social media content. Currently working with NCAA programs including NCCU Men's Basketball and Duke Football.</p>
+      <p style="margin-top: 16px;">Available for freelance projects.</p>
+    </div>
+    <div>
+      <div class="about-eyebrow">Skills</div>
+      <ul class="skills-list">
+        <li>Adobe Photoshop</li>
+        <li>Adobe Illustrator</li>
+        <li>Adobe InDesign</li>
+        <li>After Effects</li>
+        <li>Sports Branding</li>
+        <li>Social Media Graphics</li>
+        <li>Event Flyers</li>
+        <li>Motion Graphics</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ── CONTACT ── -->
+  <section class="contact-section" id="contact">
+    <div class="contact-eyebrow">007 — contact</div>
+    <h2>Get in Touch</h2>
+    <div class="contact-links">
+      <a href="https://instagram.com/png.seth" target="_blank">Instagram ↗</a>
+      <a href="mailto:your@email.com">Email ↗</a>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <span>&copy; 2026 Seth Liyanapathirana</span>
+  <span>Graphic Designer</span>
+</footer>
+
+<!-- ── LIGHTBOX ── -->
+<div class="lightbox" id="lightbox" onclick="closeLight(event)">
+  <button class="lightbox-close" onclick="closeLightbox()">[ close ]</button>
+  <img id="lightbox-img" src="" alt="">
+</div>
+
+<script>
+  // ── LOADER ──
+  (function() {
+    const full = 'Seth Liyanapathirana';
+    const textEl = document.getElementById('loader-text');
+    const cursorEl = document.getElementById('loader-cursor');
+    let i = 0;
+    setTimeout(() => {
+      const type = setInterval(() => {
+        textEl.textContent = full.slice(0, ++i).toUpperCase();
+        if (i >= full.length) {
+          clearInterval(type);
+          setTimeout(() => {
+            cursorEl.style.transition = 'opacity 0.3s';
+            cursorEl.style.opacity = '0';
+            setTimeout(() => {
+              document.getElementById('loader').classList.add('hide');
+            }, 500);
+          }, 600);
+        }
+      }, 55);
+    }, 700);
+  })();
+
+  // ── AUTO SCROLL ──
+  function initAutoScroll(el) {
+    let autoTimer;
+    const speed = 0.25;
+
+    function startAuto() {
+      clearInterval(autoTimer);
+      autoTimer = setInterval(() => {
+        el.scrollLeft += speed;
+        if (el.scrollLeft >= el.scrollWidth - el.clientWidth - 1) el.scrollLeft = 0;
+      }, 16);
+    }
+    startAuto();
+
+    el.addEventListener('mouseenter', () => clearInterval(autoTimer));
+    el.addEventListener('mouseleave', () => startAuto());
+    el.addEventListener('touchstart', () => clearInterval(autoTimer));
+    el.addEventListener('touchend', () => startAuto());
+  }
+
+  const fw = document.querySelector('.featured-grid-wrapper');
+  if (fw) initAutoScroll(fw);
+  document.querySelectorAll('.carousel').forEach(c => initAutoScroll(c));
+
+  // ── LIGHTBOX ──
+  function openLight(item) {
+    const img = item.querySelector('img');
+    if (!img) return;
+    document.getElementById('lightbox-img').src = img.src;
+    document.getElementById('lightbox').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeLightbox() {
+    document.getElementById('lightbox').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  function closeLight(e) {
+    if (e.target === document.getElementById('lightbox')) closeLightbox();
+  }
+
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeLightbox(); });
+</script>
+</body>
+</html>
